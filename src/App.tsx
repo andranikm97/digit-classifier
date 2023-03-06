@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import { CheckmarkIcon, EraserIcon, XmarkIcon } from "./components/icons";
+import { CheckmarkIcon, XmarkIcon } from "./components/icons";
 import "./App.css";
+import Canvas from "./Canvas";
 
 const Side = styled.section`
   flex: 1;
@@ -21,13 +22,6 @@ const Center = styled.section`
   margin: 0px 20px;
 `;
 
-const CanvasContainer = styled.div`
-  position: relative;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-end;
-`;
-
 const FeedbackButton = styled.button`
   border: none;
   margin: 0px 10px;
@@ -44,40 +38,6 @@ const NegativeFeedbackButton = styled(FeedbackButton)`
 `;
 
 const InstructionsContainer = styled.div``;
-
-const Canvas = styled.canvas`
-  background-color: black;
-  border: 1px solid white;
-`;
-
-const SubmitButtoContainer = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  /* flex: 1; */
-  height: 100px;
-`;
-
-const SubmitButton = styled.button`
-  border: none;
-  background-color: F0EEED;
-  font-size: 32px;
-  padding: 10px;
-  border-radius: 10px;
-  color: black;
-`;
-
-const ClearButton = styled.button`
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  background-color: transparent;
-`;
 
 function App() {
   return (
@@ -107,15 +67,7 @@ function App() {
       </Side>
 
       <Center>
-        <CanvasContainer id="canvas-container">
-          <ClearButton id="clear-button">
-            <EraserIcon />
-          </ClearButton>
-          <Canvas id="canvas"></Canvas>
-        </CanvasContainer>
-        <SubmitButtoContainer>
-          <SubmitButton id="submit-button">Recognize</SubmitButton>
-        </SubmitButtoContainer>
+        <Canvas />
       </Center>
 
       <Side>
