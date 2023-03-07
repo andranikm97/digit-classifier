@@ -1,11 +1,37 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styled from "styled-components";
 import { CheckmarkIcon, XmarkIcon } from "./components/icons";
 import "./App.css";
 import Canvas from "./Canvas";
 
+export interface Prediction {
+  prediction: string;
+  backend_id: string;
+}
 export default function App(): JSX.Element {
-  const [currentPrediction, setCurrentPrediction] = useState(null);
+  const [currentPrediction, setCurrentPrediction] = useState<Prediction | null>(
+    null
+  );
+  const [showThankYouMessage, setShowThankYouMessage] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  const handlePositveFeedback = () => {
+    fetch("http://127.0.0.1:5000/train", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        backend_id: currentPrediction.backend_id,
+        label: Number(currentPrediction.prediction),
+      }),
+    }).then(() => {
+      setShowThankYouMessage(true);
+      timeoutRef.current = setTimeout(() => {
+        setShowThankYouMessage(false);
+      }, 5000);
+    });
+  };
+
   return (
     <div className="App">
       <Side>
@@ -35,20 +61,31 @@ export default function App(): JSX.Element {
       <Center>
         <Canvas
           onPredictionReceived={(data) => {
-            console.log(data);
-            setCurrentPrediction(data.prediction);
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
+              timeoutRef.current = null;
+            }
+            setCurrentPrediction(data);
           }}
           onCanvasClear={() => setCurrentPrediction(null)}
         />
       </Center>
 
       <Side>
+        {!currentPrediction && showThankYouMessage && (
+          <p>Thanks for your feedback!</p>
+        )}
         {currentPrediction && (
           <PredictionOutputContainer>
             <h1>It's a...</h1>
-            <PredictionText>{currentPrediction}</PredictionText>
+            <PredictionText>{currentPrediction.prediction}</PredictionText>
             <FeedbackButtonsContainer>
-              <PositiveFeedbackButton id="pos-feedback-btn">
+              <PositiveFeedbackButton
+                onClick={() => {
+                  setCurrentPrediction(null);
+                  handlePositveFeedback();
+                }}
+              >
                 <CheckmarkIcon fill="white" height={30} />
               </PositiveFeedbackButton>
               <NegativeFeedbackButton id="neg-feedback-btn">
@@ -80,7 +117,8 @@ const PredictionOutputContainer = styled.div`
 `;
 
 const PredictionText = styled.p`
-  font-size: 120px;
+  font-size: 200px;
+  margin: 50px 0px;
 `;
 
 const FeedbackButtonsContainer = styled.div`

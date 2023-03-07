@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { Prediction } from "./App";
 import { EraserIcon } from "./components/icons";
 import { setupCanvas } from "./utils";
 
 const canvasSize = 600;
 
 type CanvasProps = {
-  onPredictionReceived: (data: {
-    backend_id: string;
-    prediction: string;
-  }) => void;
+  onPredictionReceived: (data: Prediction) => void;
   onCanvasClear: () => void;
 };
 export default function Canvas({
