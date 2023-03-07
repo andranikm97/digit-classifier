@@ -39,9 +39,9 @@ export default function Canvas({
         body: file,
       })
         .then((res) => res.json())
-        .then((data: CanvasProps["onPredictionReceived"]["arguments"]) =>
-          onPredictionReceived(data)
-        );
+        .then((data: CanvasProps["onPredictionReceived"]["arguments"]) => {
+          onPredictionReceived(data);
+        });
     });
   };
 
