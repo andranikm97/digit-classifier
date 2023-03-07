@@ -9,6 +9,9 @@ export interface Prediction {
   backend_id: string;
 }
 export default function App(): JSX.Element {
+  const canvasRef = useRef<{
+    clear: () => void;
+  }>();
   const [currentPrediction, setCurrentPrediction] = useState<Prediction | null>(
     null
   );
@@ -71,17 +74,19 @@ export default function App(): JSX.Element {
 
       <Center>
         <Canvas
+          ref={canvasRef}
           onPredictionReceived={(data) => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
               timeoutRef.current = null;
             }
             setCurrentPrediction(data);
+            hideCorrectionContainer();
+            hideThankYouMessage();
           }}
           onCanvasClear={() => {
             setCurrentPrediction(null);
             hideCorrectionContainer();
-            hideThankYouMessage();
           }}
         />
       </Center>
@@ -99,6 +104,7 @@ export default function App(): JSX.Element {
                 <PositiveFeedbackButton
                   onClick={() => {
                     handleFeedbackSubmit(currentPrediction.prediction);
+                    canvasRef.current.clear();
                   }}
                 >
                   <CheckmarkIcon fill="white" height={30} />

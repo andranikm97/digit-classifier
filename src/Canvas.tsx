@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 import { Prediction } from "./App";
 import { EraserIcon } from "./components/icons";
@@ -10,13 +16,25 @@ type CanvasProps = {
   onPredictionReceived: (data: Prediction) => void;
   onCanvasClear: () => void;
 };
-export default function Canvas({
-  onPredictionReceived = () => {},
-  onCanvasClear = () => {},
-}: CanvasProps) {
+function Canvas(
+  { onPredictionReceived = () => {}, onCanvasClear = () => {} }: CanvasProps,
+  ref
+) {
   const canvasRef = useRef<HTMLCanvasElement>();
+  const clearButtonRef = useRef<HTMLButtonElement>();
   const [isCanvasClear, setIsCanvasClear] = useState(true);
 
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        clear() {
+          clearButtonRef.current.click();
+        },
+      };
+    },
+    []
+  );
   useEffect(() => {
     setupCanvas(canvasRef.current, canvasSize, {
       mousedown: [() => setIsCanvasClear(false)],
@@ -58,7 +76,11 @@ export default function Canvas({
   return (
     <>
       <Container>
-        <ClearButton onClick={clearCanvas} id="clear-button">
+        <ClearButton
+          ref={clearButtonRef}
+          onClick={clearCanvas}
+          id="clear-button"
+        >
           <EraserIcon width={50} height={50} fill="white" />
         </ClearButton>
         <Board ref={canvasRef} />
@@ -114,3 +136,5 @@ const SubmitButton = styled.button`
   border-radius: 10px;
   color: black;
 `;
+
+export default forwardRef(Canvas);
