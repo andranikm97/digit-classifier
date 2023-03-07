@@ -1,6 +1,12 @@
 import { MouseEvent } from "react";
 
-export function setupCanvas(canvas: HTMLCanvasElement, canvasSize: number) {
+export function setupCanvas(
+  canvas: HTMLCanvasElement,
+  canvasSize: number,
+  callbacks?: {
+    mousedown: (() => void)[];
+  }
+) {
   let xStart, yStart, xEnd, yEnd;
   let mousedown = false;
   const ctx = canvas.getContext("2d");
@@ -14,6 +20,7 @@ export function setupCanvas(canvas: HTMLCanvasElement, canvasSize: number) {
   ctx.strokeStyle = "white";
 
   canvas.addEventListener("mousedown", (event) => {
+    callbacks.mousedown?.forEach((callback) => callback());
     event.preventDefault();
     event.stopPropagation();
     xStart = event.offsetX;

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { EraserIcon } from "./components/icons";
 import { setupCanvas } from "./utils";
@@ -10,19 +10,31 @@ type CanvasProps = {
     backend_id: string;
     prediction: string;
   }) => void;
+  onCanvasClear: () => void;
 };
 export default function Canvas({
   onPredictionReceived = () => {},
+  onCanvasClear = () => {},
 }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>();
+  const [isCanvasClear, setIsCanvasClear] = useState(true);
 
   useEffect(() => {
-    setupCanvas(canvasRef.current, canvasSize);
+    setupCanvas(canvasRef.current, canvasSize, {
+      mousedown: [() => setIsCanvasClear(false)],
+    });
   }, []);
+
+  useEffect(() => {
+    if (isCanvasClear) {
+      onCanvasClear();
+    }
+  }, [isCanvasClear, onCanvasClear]);
 
   const clearCanvas = () => {
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasSize, canvasSize);
+    setIsCanvasClear(true);
   };
 
   const handleSubmit = () => {
@@ -54,9 +66,11 @@ export default function Canvas({
         <Board ref={canvasRef} />
       </Container>
       <SubmitButtoContainer>
-        <SubmitButton onClick={handleSubmit} id="submit-button">
-          Recognize
-        </SubmitButton>
+        {!isCanvasClear && (
+          <SubmitButton onClick={handleSubmit} id="submit-button">
+            Recognize
+          </SubmitButton>
+        )}
       </SubmitButtoContainer>
     </>
   );

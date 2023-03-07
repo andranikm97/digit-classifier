@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { CheckmarkIcon, XmarkIcon } from "./components/icons";
 import "./App.css";
@@ -38,6 +38,7 @@ export default function App(): JSX.Element {
             console.log(data);
             setCurrentPrediction(data.prediction);
           }}
+          onCanvasClear={() => setCurrentPrediction(null)}
         />
       </Center>
 
