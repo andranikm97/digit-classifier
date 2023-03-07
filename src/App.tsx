@@ -12,9 +12,20 @@ export default function App(): JSX.Element {
   const [currentPrediction, setCurrentPrediction] = useState<Prediction | null>(
     null
   );
-  const [showThankYouMessage, setShowThankYouMessage] = useState(false);
+
+  const [currentCorrection, setCurrentCorrection] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const handlePositveFeedback = () => {
+
+  const [correctionContainerShown, setCorrectionContainerShown] =
+    useState(false);
+  const [thankYouMessageShown, setThankYouMessageShown] = useState(false);
+  const showThankYouMessage = () => setThankYouMessageShown(true);
+  const hideThankYouMessage = () => setThankYouMessageShown(false);
+  const showCorrectionContainer = () => setCorrectionContainerShown(true);
+  const hideCorrectionContainer = () => setCorrectionContainerShown(false);
+  const handleFeedbackSubmit = (label: string) => {
+    setCurrentPrediction(null);
+    setCurrentCorrection(null);
     fetch("http://127.0.0.1:5000/train", {
       method: "PUT",
       headers: {
@@ -22,12 +33,12 @@ export default function App(): JSX.Element {
       },
       body: JSON.stringify({
         backend_id: currentPrediction.backend_id,
-        label: Number(currentPrediction.prediction),
+        label,
       }),
     }).then(() => {
-      setShowThankYouMessage(true);
+      showThankYouMessage();
       timeoutRef.current = setTimeout(() => {
-        setShowThankYouMessage(false);
+        hideThankYouMessage();
       }, 5000);
     });
   };
@@ -67,42 +78,74 @@ export default function App(): JSX.Element {
             }
             setCurrentPrediction(data);
           }}
-          onCanvasClear={() => setCurrentPrediction(null)}
+          onCanvasClear={() => {
+            setCurrentPrediction(null);
+            hideCorrectionContainer();
+            hideThankYouMessage();
+          }}
         />
       </Center>
 
       <Side>
-        {!currentPrediction && showThankYouMessage && (
+        {!currentPrediction && thankYouMessageShown && (
           <p>Thanks for your feedback!</p>
         )}
         {currentPrediction && (
           <PredictionOutputContainer>
             <h1>It's a...</h1>
             <PredictionText>{currentPrediction.prediction}</PredictionText>
-            <FeedbackButtonsContainer>
-              <PositiveFeedbackButton
-                onClick={() => {
-                  setCurrentPrediction(null);
-                  handlePositveFeedback();
-                }}
-              >
-                <CheckmarkIcon fill="white" height={30} />
-              </PositiveFeedbackButton>
-              <NegativeFeedbackButton id="neg-feedback-btn">
-                <XmarkIcon fill="white" height={30} />
-              </NegativeFeedbackButton>
-            </FeedbackButtonsContainer>
-            <CorrectionContainer>
-              <label>Should be:</label>
-              <CorrectionInput
-                id="correction-input"
-                placeholder="digit"
-                maxLength={1}
-              />
-              <PositiveFeedbackButton id="pos-feedback-btn-correction">
-                <CheckmarkIcon />
-              </PositiveFeedbackButton>
-            </CorrectionContainer>
+            {!correctionContainerShown && (
+              <FeedbackButtonsContainer>
+                <PositiveFeedbackButton
+                  onClick={() => {
+                    handleFeedbackSubmit(currentPrediction.prediction);
+                  }}
+                >
+                  <CheckmarkIcon fill="white" height={30} />
+                </PositiveFeedbackButton>
+                <NegativeFeedbackButton
+                  onClick={() => {
+                    showCorrectionContainer();
+                  }}
+                >
+                  <XmarkIcon fill="white" height={30} />
+                </NegativeFeedbackButton>
+              </FeedbackButtonsContainer>
+            )}
+            {correctionContainerShown && (
+              <CorrectionContainer>
+                <label>Should be:</label>
+                <CorrectionInput
+                  placeholder="#"
+                  maxLength={1}
+                  value={currentCorrection}
+                  onChange={(e) => {
+                    const input = e.target.value;
+                    if (input === "" || Number(input)) {
+                      setCurrentCorrection(input);
+                    }
+                  }}
+                  onKeyUp={(e) => {
+                    if (
+                      currentCorrection.length === 1 &&
+                      e.code.includes("Digit")
+                    ) {
+                      setCurrentCorrection(e.code.slice(5));
+                    }
+                  }}
+                />
+                <PositiveFeedbackButton
+                  onClick={() => {
+                    setCurrentPrediction(null);
+                    hideCorrectionContainer();
+                    hideThankYouMessage();
+                    handleFeedbackSubmit(currentCorrection);
+                  }}
+                >
+                  <CheckmarkIcon fill={"white"} height={30} />
+                </PositiveFeedbackButton>
+              </CorrectionContainer>
+            )}
           </PredictionOutputContainer>
         )}
       </Side>
@@ -129,14 +172,16 @@ const FeedbackButtonsContainer = styled.div`
 `;
 
 const CorrectionContainer = styled.div`
-  display: none;
+  display: flex;
   flex-flow: row nowrap;
   align-items: center;
   justify-content: space-between;
 `;
 
 const CorrectionInput = styled.input`
-  margin: 0px 5px;
+  font-size: 30px;
+  width: 50px;
+  margin: 0px 10px;
 `;
 
 const Side = styled.section`
