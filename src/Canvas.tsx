@@ -58,7 +58,7 @@ function Canvas(
       const file = new FormData();
       file.append("fname", "image.png");
       file.append("data", blob);
-      fetch("http://127.0.0.1:5000/recognize", {
+      fetch(process.env.REACT_APP_API_ENDPOINT + "/recognize", {
         method: "POST",
         mode: "cors",
         headers: {

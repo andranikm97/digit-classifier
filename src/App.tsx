@@ -29,7 +29,7 @@ export default function App(): JSX.Element {
   const handleFeedbackSubmit = (label: string) => {
     setCurrentPrediction(null);
     setCurrentCorrection(null);
-    fetch("http://127.0.0.1:5000/train", {
+    fetch(process.env.REACT_APP_API_ENDPOINT + "/train", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
