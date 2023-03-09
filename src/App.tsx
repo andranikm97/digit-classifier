@@ -15,7 +15,7 @@ export default function App(): JSX.Element {
   const [currentPrediction, setCurrentPrediction] = useState<Prediction | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [currentCorrection, setCurrentCorrection] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout>();
@@ -30,7 +30,7 @@ export default function App(): JSX.Element {
   const handleFeedbackSubmit = (label: string) => {
     setCurrentPrediction(null);
     setCurrentCorrection(null);
-    fetch(process.env.REACT_APP_API_ENDPOINT + "/train", {
+    fetch(import.meta.env.VITE_API_ENDPOINT + "/train", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -78,6 +78,7 @@ export default function App(): JSX.Element {
           <Canvas
             ref={canvasRef}
             onPredictionReceived={(data) => {
+              setIsLoading(false);
               if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
                 timeoutRef.current = null;
@@ -90,6 +91,7 @@ export default function App(): JSX.Element {
               setCurrentPrediction(null);
               hideCorrectionContainer();
             }}
+            onPredictionRequest={() => setIsLoading(true)}
           />
         </Center>
 
@@ -97,7 +99,7 @@ export default function App(): JSX.Element {
           {!currentPrediction && thankYouMessageShown && (
             <p>Thanks for your feedback!</p>
           )}
-          {currentPrediction && (
+          {(isLoading || currentPrediction) && (
             <PredictionOutputContainer>
               <h1>It's a...</h1>
               {isLoading ? (
@@ -105,7 +107,7 @@ export default function App(): JSX.Element {
               ) : (
                 <PredictionText>{currentPrediction.prediction}</PredictionText>
               )}
-              {!correctionContainerShown && (
+              {!isLoading && !correctionContainerShown && (
                 <FeedbackButtonsContainer>
                   <PositiveFeedbackButton
                     onClick={() => {
@@ -124,7 +126,7 @@ export default function App(): JSX.Element {
                   </NegativeFeedbackButton>
                 </FeedbackButtonsContainer>
               )}
-              {correctionContainerShown && (
+              {!isLoading && correctionContainerShown && (
                 <CorrectionContainer>
                   <label>Should be:</label>
                   <CorrectionInput
