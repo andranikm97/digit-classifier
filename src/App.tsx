@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import styled from "styled-components";
 import { CheckmarkIcon, XmarkIcon } from "./components/icons";
-import "./App.css";
 import Canvas from "./Canvas";
 
 export interface Prediction {
@@ -47,117 +46,139 @@ export default function App(): JSX.Element {
   };
 
   return (
-    <div className="App">
-      <Side>
-        <InstructionsContainer>
-          <h1>Instructions</h1>
-          <ol>
-            <li>
-              Draw a <strong>single</strong> digit on the canvas
-            </li>
-            <li>Hit the "Recognize" button below</li>
-            <li>See the prediction on the right</li>
-          </ol>
-          <p>
-            *Help train this neural network by pressing{" "}
-            <PositiveFeedbackButton width={30} disabled>
-              <CheckmarkIcon fill="white" height={20} />
-            </PositiveFeedbackButton>
-            or
-            <NegativeFeedbackButton width={30} disabled>
-              <XmarkIcon fill="white" height={20} />
-            </NegativeFeedbackButton>
-            .
-          </p>
-        </InstructionsContainer>
-      </Side>
+    <Main>
+      <Wrapper>
+        <Side>
+          <InstructionsContainer>
+            <h1>Instructions</h1>
+            <ol>
+              <li>
+                Draw a <strong>single</strong> digit on the canvas
+              </li>
+              <li>Hit the "Recognize" button below</li>
+              <li>See the prediction on the right</li>
+            </ol>
+            <p>
+              *Help train this neural network by pressing{" "}
+              <PositiveFeedbackButton width={30} disabled>
+                <CheckmarkIcon fill="white" height={20} />
+              </PositiveFeedbackButton>
+              or
+              <NegativeFeedbackButton width={30} disabled>
+                <XmarkIcon fill="white" height={20} />
+              </NegativeFeedbackButton>
+              .
+            </p>
+          </InstructionsContainer>
+        </Side>
 
-      <Center>
-        <Canvas
-          ref={canvasRef}
-          onPredictionReceived={(data) => {
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-              timeoutRef.current = null;
-            }
-            setCurrentPrediction(data);
-            hideCorrectionContainer();
-            hideThankYouMessage();
-          }}
-          onCanvasClear={() => {
-            setCurrentPrediction(null);
-            hideCorrectionContainer();
-          }}
-        />
-      </Center>
+        <Center>
+          <Canvas
+            ref={canvasRef}
+            onPredictionReceived={(data) => {
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+              }
+              setCurrentPrediction(data);
+              hideCorrectionContainer();
+              hideThankYouMessage();
+            }}
+            onCanvasClear={() => {
+              setCurrentPrediction(null);
+              hideCorrectionContainer();
+            }}
+          />
+        </Center>
 
-      <Side>
-        {!currentPrediction && thankYouMessageShown && (
-          <p>Thanks for your feedback!</p>
-        )}
-        {currentPrediction && (
-          <PredictionOutputContainer>
-            <h1>It's a...</h1>
-            <PredictionText>{currentPrediction.prediction}</PredictionText>
-            {!correctionContainerShown && (
-              <FeedbackButtonsContainer>
-                <PositiveFeedbackButton
-                  onClick={() => {
-                    handleFeedbackSubmit(currentPrediction.prediction);
-                    canvasRef.current.clear();
-                  }}
-                >
-                  <CheckmarkIcon fill="white" height={30} />
-                </PositiveFeedbackButton>
-                <NegativeFeedbackButton
-                  onClick={() => {
-                    showCorrectionContainer();
-                  }}
-                >
-                  <XmarkIcon fill="white" height={30} />
-                </NegativeFeedbackButton>
-              </FeedbackButtonsContainer>
-            )}
-            {correctionContainerShown && (
-              <CorrectionContainer>
-                <label>Should be:</label>
-                <CorrectionInput
-                  placeholder="#"
-                  maxLength={1}
-                  value={currentCorrection}
-                  onChange={(e) => {
-                    const input = e.target.value;
-                    if (input === "" || Number(input)) {
-                      setCurrentCorrection(input);
-                    }
-                  }}
-                  onKeyUp={(e) => {
-                    if (
-                      currentCorrection.length === 1 &&
-                      e.code.includes("Digit")
-                    ) {
-                      setCurrentCorrection(e.code.slice(5));
-                    }
-                  }}
-                />
-                <PositiveFeedbackButton
-                  onClick={() => {
-                    setCurrentPrediction(null);
-                    hideCorrectionContainer();
-                    hideThankYouMessage();
-                    handleFeedbackSubmit(currentCorrection);
-                  }}
-                >
-                  <CheckmarkIcon fill={"white"} height={30} />
-                </PositiveFeedbackButton>
-              </CorrectionContainer>
-            )}
-          </PredictionOutputContainer>
-        )}
-      </Side>
-    </div>
+        <Side>
+          {!currentPrediction && thankYouMessageShown && (
+            <p>Thanks for your feedback!</p>
+          )}
+          {currentPrediction && (
+            <PredictionOutputContainer>
+              <h1>It's a...</h1>
+              <PredictionText>{currentPrediction.prediction}</PredictionText>
+              {!correctionContainerShown && (
+                <FeedbackButtonsContainer>
+                  <PositiveFeedbackButton
+                    onClick={() => {
+                      handleFeedbackSubmit(currentPrediction.prediction);
+                      canvasRef.current.clear();
+                    }}
+                  >
+                    <CheckmarkIcon fill="white" height={30} />
+                  </PositiveFeedbackButton>
+                  <NegativeFeedbackButton
+                    onClick={() => {
+                      showCorrectionContainer();
+                    }}
+                  >
+                    <XmarkIcon fill="white" height={30} />
+                  </NegativeFeedbackButton>
+                </FeedbackButtonsContainer>
+              )}
+              {correctionContainerShown && (
+                <CorrectionContainer>
+                  <label>Should be:</label>
+                  <CorrectionInput
+                    placeholder="#"
+                    maxLength={1}
+                    value={currentCorrection}
+                    onChange={(e) => {
+                      const input = e.target.value;
+                      if (input === "" || Number(input)) {
+                        setCurrentCorrection(input);
+                      }
+                    }}
+                    onKeyUp={(e) => {
+                      if (
+                        currentCorrection.length === 1 &&
+                        e.code.includes("Digit")
+                      ) {
+                        setCurrentCorrection(e.code.slice(5));
+                      }
+                    }}
+                  />
+                  <PositiveFeedbackButton
+                    onClick={() => {
+                      setCurrentPrediction(null);
+                      hideCorrectionContainer();
+                      hideThankYouMessage();
+                      handleFeedbackSubmit(currentCorrection);
+                      canvasRef.current.clear();
+                    }}
+                  >
+                    <CheckmarkIcon fill={"white"} height={30} />
+                  </PositiveFeedbackButton>
+                </CorrectionContainer>
+              )}
+            </PredictionOutputContainer>
+          )}
+        </Side>
+      </Wrapper>
+    </Main>
   );
 }
+
+const Main = styled.div`
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Wrapper = styled.div`
+  display: flex;
+  height: 100%;
+  max-height: 789px;
+  width: 100%;
+  max-width: 1440px;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+`;
 
 const PredictionOutputContainer = styled.div`
   display: flex;
