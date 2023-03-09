@@ -15,9 +15,14 @@ const canvasSize = 600;
 type CanvasProps = {
   onPredictionReceived: (data: Prediction) => void;
   onCanvasClear: () => void;
+  onPredictionRequest: () => void;
 };
 function Canvas(
-  { onPredictionReceived = () => {}, onCanvasClear = () => {} }: CanvasProps,
+  {
+    onPredictionReceived = () => {},
+    onCanvasClear = () => {},
+    onPredictionRequest = () => {},
+  }: CanvasProps,
   ref
 ) {
   const canvasRef = useRef<HTMLCanvasElement>();
@@ -53,12 +58,13 @@ function Canvas(
     setIsCanvasClear(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    onPredictionRequest();
     canvasRef.current.toBlob((blob) => {
       const file = new FormData();
       file.append("fname", "image.png");
       file.append("data", blob);
-      fetch(process.env.REACT_APP_API_ENDPOINT + "/recognize", {
+      fetch(import.meta.env.VITE_API_ENDPOINT + "/recognize", {
         method: "POST",
         mode: "cors",
         headers: {
