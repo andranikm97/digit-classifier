@@ -17,7 +17,7 @@ export default function App(): JSX.Element {
   );
   const [isLoading, setIsLoading] = useState(true);
 
-  const [currentCorrection, setCurrentCorrection] = useState<null>("");
+  const [currentCorrection, setCurrentCorrection] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const [correctionContainerShown, setCorrectionContainerShown] =
