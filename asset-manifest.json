@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/digit-classifier/static/css/main.f3ddacab.css",
-    "main.js": "/digit-classifier/static/js/main.87068372.js",
+    "main.js": "/digit-classifier/static/js/main.8cc5570b.js",
     "index.html": "/digit-classifier/index.html",
     "main.f3ddacab.css.map": "/digit-classifier/static/css/main.f3ddacab.css.map",
-    "main.87068372.js.map": "/digit-classifier/static/js/main.87068372.js.map"
+    "main.8cc5570b.js.map": "/digit-classifier/static/js/main.8cc5570b.js.map"
   },
   "entrypoints": [
     "static/css/main.f3ddacab.css",
-    "static/js/main.87068372.js"
+    "static/js/main.8cc5570b.js"
   ]
 }
