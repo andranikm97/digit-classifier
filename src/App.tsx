@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { CheckmarkIcon, XmarkIcon } from "./components/icons";
 import Canvas from "./Canvas";
@@ -28,6 +28,7 @@ export default function App(): JSX.Element {
   const showCorrectionContainer = () => setCorrectionContainerShown(true);
   const hideCorrectionContainer = () => setCorrectionContainerShown(false);
   const handleFeedbackSubmit = (label: string) => {
+    canvasRef.current?.clear();
     setCurrentPrediction(null);
     setCurrentCorrection(null);
     fetch(import.meta.env.VITE_API_ENDPOINT + "/train", {
@@ -46,6 +47,13 @@ export default function App(): JSX.Element {
       }, 5000);
     });
   };
+
+  const correctionInputRef = useRef<HTMLInputElement>();
+  useEffect(() => {
+    if (correctionContainerShown) {
+      correctionInputRef.current.focus();
+    }
+  }, [correctionInputRef.current, correctionContainerShown]);
 
   return (
     <Main>
@@ -112,7 +120,6 @@ export default function App(): JSX.Element {
                   <PositiveFeedbackButton
                     onClick={() => {
                       handleFeedbackSubmit(currentPrediction.prediction);
-                      canvasRef.current?.clear();
                     }}
                   >
                     <CheckmarkIcon fill="white" height={30} />
@@ -130,6 +137,7 @@ export default function App(): JSX.Element {
                 <CorrectionContainer>
                   <label>Should be:</label>
                   <CorrectionInput
+                    ref={correctionInputRef}
                     placeholder="#"
                     maxLength={1}
                     value={currentCorrection}
@@ -154,7 +162,6 @@ export default function App(): JSX.Element {
                       hideCorrectionContainer();
                       hideThankYouMessage();
                       handleFeedbackSubmit(currentCorrection);
-                      canvasRef.current?.clear();
                     }}
                   >
                     <CheckmarkIcon fill={"white"} height={30} />

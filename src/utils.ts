@@ -7,10 +7,9 @@ export function setupCanvas(
     mousedown: (() => void)[];
   }
 ) {
-  let xStart: number, yStart: number, xEnd: number, yEnd: number;
+  let xStart, yStart, xEnd, yEnd;
   let mousedown = false;
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
   ctx.canvas.width = canvasSize;
   ctx.canvas.height = canvasSize;
   ctx.fillStyle = "black";
@@ -21,9 +20,13 @@ export function setupCanvas(
   ctx.strokeStyle = "white";
 
   canvas.addEventListener("mousedown", (event) => {
-    callbacks?.mousedown.forEach((callback) => callback());
+    callbacks.mousedown?.forEach((callback) => callback());
     event.preventDefault();
+    event.stopPropagation();
+    xStart = event.offsetX;
+    xEnd = xStart;
     yStart = event.offsetY;
+    yEnd = yStart;
     mousedown = true;
     draw("mousedown");
   });
@@ -48,7 +51,6 @@ export function setupCanvas(
   });
 
   function draw(event: MouseEvent["type"]) {
-    if (!ctx) return;
     if (event === "mousedown") {
       ctx.beginPath();
       ctx.moveTo(xStart, yStart);
