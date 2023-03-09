@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import styled from "styled-components";
 import { CheckmarkIcon, XmarkIcon } from "./components/icons";
 import Canvas from "./Canvas";
+import { ThreeDotsLoader } from "./components/loaders";
 
 export interface Prediction {
   prediction: string;
@@ -14,8 +15,9 @@ export default function App(): JSX.Element {
   const [currentPrediction, setCurrentPrediction] = useState<Prediction | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [currentCorrection, setCurrentCorrection] = useState("");
+  const [currentCorrection, setCurrentCorrection] = useState<null>("");
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   const [correctionContainerShown, setCorrectionContainerShown] =
@@ -98,13 +100,17 @@ export default function App(): JSX.Element {
           {currentPrediction && (
             <PredictionOutputContainer>
               <h1>It's a...</h1>
-              <PredictionText>{currentPrediction.prediction}</PredictionText>
+              {isLoading ? (
+                <ThreeDotsLoader fill="#000" />
+              ) : (
+                <PredictionText>{currentPrediction.prediction}</PredictionText>
+              )}
               {!correctionContainerShown && (
                 <FeedbackButtonsContainer>
                   <PositiveFeedbackButton
                     onClick={() => {
                       handleFeedbackSubmit(currentPrediction.prediction);
-                      canvasRef.current.clear();
+                      canvasRef.current?.clear();
                     }}
                   >
                     <CheckmarkIcon fill="white" height={30} />
@@ -146,7 +152,7 @@ export default function App(): JSX.Element {
                       hideCorrectionContainer();
                       hideThankYouMessage();
                       handleFeedbackSubmit(currentCorrection);
-                      canvasRef.current.clear();
+                      canvasRef.current?.clear();
                     }}
                   >
                     <CheckmarkIcon fill={"white"} height={30} />
