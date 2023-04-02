@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { Prediction } from "./App";
 import { EraserIcon } from "./components/icons";
 import { setupCanvas } from "./utils";
+import useEventDispatch from "./hooks/useEventDispatch";
 
 const canvasSize = 600;
 
@@ -28,6 +29,8 @@ function Canvas(
   const canvasRef = useRef<HTMLCanvasElement>();
   const clearButtonRef = useRef<HTMLButtonElement>();
   const [isCanvasClear, setIsCanvasClear] = useState(true);
+
+  const dispatchEvent = useEventDispatch();
 
   useImperativeHandle(
     ref,
@@ -53,6 +56,7 @@ function Canvas(
   }, [isCanvasClear, onCanvasClear]);
 
   const clearCanvas = () => {
+    dispatchEvent("clear", "hellow");
     const ctx = canvasRef.current.getContext("2d");
     ctx.clearRect(0, 0, canvasSize, canvasSize);
     setIsCanvasClear(true);

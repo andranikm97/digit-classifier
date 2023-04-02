@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { CheckmarkIcon, XmarkIcon } from "./components/icons";
 import Canvas from "./Canvas";
 import { ThreeDotsLoader } from "./components/loaders";
+import useEvent from "./hooks/useEvent";
 
 export interface Prediction {
   prediction: string;
@@ -47,6 +48,10 @@ export default function App(): JSX.Element {
       }, 5000);
     });
   };
+
+  useEvent("clear", (message) => {
+    console.log("loud and clear");
+  });
 
   const correctionInputRef = useRef<HTMLInputElement>();
   useEffect(() => {
