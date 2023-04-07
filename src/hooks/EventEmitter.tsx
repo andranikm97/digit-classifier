@@ -1,10 +1,8 @@
 import React, { useCallback, useMemo, useReducer } from "react";
 import EventContext from "./EventContext";
 export default function EventEmitter({ children }) {
-  console.log("?");
   const [subscribers, dispatch] = useReducer(
     (state, action) => {
-      console.log("he");
       const { type, event } = action;
       switch (type) {
         case "subscribe": {
@@ -40,7 +38,6 @@ export default function EventEmitter({ children }) {
 
   const subscribe = useCallback(
     (event, callback) => {
-      console.log("here");
       dispatch({ type: "subscribe", event, callback });
     },
     [dispatch]
