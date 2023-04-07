@@ -68,7 +68,7 @@ function Canvas(
       const file = new FormData();
       file.append("fname", "image.png");
       file.append("data", blob);
-      fetch(import.meta.env.VITE_API_ENDPOINT + "/recognize", {
+      fetch(import.meta.env.SERVER_ENDPOINT + "/recognize", {
         method: "POST",
         mode: "cors",
         headers: {
