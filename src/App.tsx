@@ -32,7 +32,7 @@ export default function App(): JSX.Element {
     canvasRef.current?.clear();
     setCurrentPrediction(null);
     setCurrentCorrection(null);
-    fetch(import.meta.env.SERVER_ENDPOINT + "/train", {
+    fetch(import.meta.env.VITE_SERVER_ENDPOINT + "/train", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
